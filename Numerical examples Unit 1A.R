@@ -3,7 +3,7 @@
 # Numerical examples for part A of learning unit 1
 # =================================================================================
 #
-# The aim of this set of examples is to familarize the student with R and introduce a number of programming techniques that will be used in later examples.
+# The aim of this set of examples is to familiarize the student with R and introduce a number of programming techniques that will be used in later examples.
 #
 # =================================================================================
 # Time series objects
