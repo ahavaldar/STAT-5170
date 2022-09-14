@@ -56,6 +56,7 @@ ts.plot(sp500wr.ts, xlab="year", ylab="return", main="S&P 500 weekly returns")
 
 # The formula for a return is r(t) = [x(t) - x(t-1)]/x(t-1), which implies x(t) = [1+r(t)]*x(t-1). Thus, if we are able to specify a starting value, x(t0), for the last week of 2002, then we can reconstruct the weekly values of the S&P 500. For purposes of illustation, let us set the starting value to x(t0)=50 dollars. The time sequence of S&P 500 is then calculated as follows:
 
+
 x0 <- 50
 sp500wv <- numeric(length=n)
 sp500wv[1] <- (1 + sp500w[1])*x0
@@ -72,9 +73,8 @@ ts.plot(sp500wv.ts, xlab="year", ylab="value", main="S&P 500 weekly values")
 # Monthly beach-shop souvenir sales in Australia
 # ---------------------------------------------------------------------------------
 
-# A time series of souvenir-sales data in available in an external file, formatted as comma-separated values (CSV). To specify where on your computer the file resides, it is first necessary to submit the "setwd" command to set the "working directory" to that location. Because the full path name of such locations are long, I typically store the path name in a variable that I call "DataDirectory". Be sure to define that variable before submitting the following command:
-
-setwd(DataDirectory)
+# A time series of souvenir-sales data in available in an 
+#external file, formatted as comma-separated values (CSV). 
 
 # The data may now be read in using the "read.csv" command:
 
@@ -82,9 +82,12 @@ souvenir.df <- read.csv(file="souvenir.csv", header=FALSE)
 names(souvenir.df) <- "sales"
 n <- length(souvenir.df$sales)
 
-# The format of these data is that of a "data frame", which is an object that is used in many statistical functions in R. A data frame typically consists of several columns of variables. The "souvenir.df" data frame just created consists of just one variable. The "names" command is used to name this variable.
+# The format of these data is that of a "data frame", 
+#which is an object that is used in many statistical functions in R. A data frame typically consists of several columns of variables. The "souvenir.df" data frame just created consists of just one variable. The "names" command is used to name this variable.
 
-# These are monthly data, whose first measurement is for January, 1987. This information is incorporated into the data set by converting to a time-series object:
+# These are monthly data, whose first measurement is for 
+#January, 1987. This information is incorporated into the data set 
+#by converting to a time-series object:
 
 souvenir.ts <- ts(data=souvenir.df$sales/1000, frequency=12, start=c(1987, 1))
 
@@ -94,7 +97,13 @@ souvenir.ts <- ts(data=souvenir.df$sales/1000, frequency=12, start=c(1987, 1))
 
 ts.plot(souvenir.ts, xlab="year", ylab="sales ($1000)", main="Souvenir sales in Australia")
 
-# An ordinary regression of these data against time may be implemented using R's build in "lm" command, which is used for the analysis of "linear models." The command takes as input a data frame object that stores the data to be analyzed. The following code adds a regressor variable to "sales.df" data frame, while converting the units of sales to $1000, and assigns names to the variables.
+# An ordinary regression of these data against time may 
+#be implemented using R's build in "lm" command, 
+#which is used for the analysis of "linear models." 
+#The command takes as input a data frame object that stores 
+#the data to be analyzed. The following code adds a regressor 
+#variable to "sales.df" data frame, while converting the units of 
+#sales to $1000, and assigns names to the variables.
 
 souvenir.df <- data.frame(souvenir.df$sales/1000, 1:n)
 names(souvenir.df) <- c("sales", "time")
@@ -104,7 +113,8 @@ names(souvenir.df) <- c("sales", "time")
 souvenir.lm <- lm(sales ~ time, data=souvenir.df)
 summary(souvenir.lm)
 
-# A scatterplot with a fitted regression line, and residual plot is generated as follows.
+# A scatterplot with a fitted regression line, and residual plot 
+# is generated as follows.
 
 par(mfrow = c(2, 1))
 par(mar=c(2.00, 2.00, 1.00, 1.00)) #bottom, left, top, and right
@@ -177,7 +187,7 @@ save(summer.df, summer.acf, file="summer_add.RData")
 
 # Monthly temperature data for Dubuque, IA are provided in an external package called "TSA". Provided the package is installed on your machine, the data may be access without loading the entire package into the R session. This is accomplished using the following code'
 
-#install.packages("TSA") 
+install.packages("TSA") 
 data(data=tempdub, package="TSA")
 tempdub
 
@@ -209,7 +219,6 @@ ts.plot(marriages.ts, xlab="year", ylab="percent", main="Marriages in the Church
 
 # Daily proces for IBM stock are also stored in text format.
 
-setwd(DataDirectory)
 ibmv.raw <- scan(file="dailyibm.RData", sep="\n")
 n <- length(ibmv.raw)
 
@@ -239,9 +248,18 @@ par(mfrow = c(1, 1))
 # Random walk time series
 # ---------------------------------------------------------------------------------
 
-# Two key properties of a random walk is that the expectations, variances, and autocovariances of individual measurements can depend on time. The relevant formulas are E[xt]=delta*t+x0, Var[xt]=t*sigw^2, and Cov[xs,xt]=min(s,t)*sigw^2, where x0 is the initial value at time t=0, delta is a the drift parameter, and sigw is the standard deviation of the underlying white-noise sequence.
+# Two key properties of a random walk is that the expectations, 
+#variances, and autocovariances of individual measurements can 
+#depend on time. The relevant formulas are 
+#E[xt]=delta*t+x0, Var[xt]=t*sigw^2, and Cov[xs,xt]=min(s,t)*sigw^2, 
+#where x0 is the initial value at time t=0, delta is a the drift 
+#parameter, and sigw is the standard deviation of the underlying 
+#white-noise sequence.
 
-# In this example, we explore these properties by simulation. To start, the following code creates a user-defined function that simualtes a single sample path up to time t=25 of a random walk.
+# In this example, we explore these properties by simulation. 
+#To start, the following code creates a user-defined function 
+#that simualtes a single sample path up to time t=25 of a random 
+#walk.
 
 rw.sim <- function(n, sigw, delta=0, x0=0) {
   wn.samp <- rnorm(n=n, mean=0, sd=sigw)
@@ -254,7 +272,8 @@ rw.sim <- function(n, sigw, delta=0, x0=0) {
   return(rw.ts)
 }
 
-# The following code executes the function and makes a plot of the simulated sample path.
+# The following code executes the function and makes a 
+#plot of the simulated sample path.
 
 n <- 25
 x0 <- 0
@@ -263,7 +282,10 @@ delta <- 0.25
 rw.ts <- rw.sim(n=n, sigw=sigw, delta=delta, x0=x0)
 ts.plot(rw.ts, xlab="", ylab="value", main=paste("Random walk: x0=", x0, ", delta=", delta, sep=""))
 
-# It is difficult to get a sense of the properties of random walk time series from just a single simulated series. The following code independently simulates multiple random walks under the same parameters.
+# It is difficult to get a sense of the properties of random walk 
+#time series from just a single simulated series. The following 
+#code independently simulates multiple random walks under the same 
+#parameters.
 
 n.rep <- 5
 rw.seq <- matrix(data=0, nrow=n, ncol=n.rep)
@@ -271,7 +293,8 @@ for (i.rep in 1:n.rep) {
   rw.seq[, i.rep] <- as.numeric(rw.sim(n=n, sigw=sigw, delta=delta, x0=x0))
 }
 
-# The following code genarates a plot the overlaid simulated time series.
+# The following code genarates a plot the overlaid simulated 
+#time series.
 
 ymin <- min(rw.seq); ymax <- max(rw.seq); yrng <- ymax-ymin
 plot(0, 0, type="l", lty=1, lwd=1, col="white", xlim=c(0, n+1), ylim=c(ymin-0.1*yrng, ymax+0.1*yrng), xlab="", ylab="value", main=paste("Random walks: x0=", x0, ", delta=", delta, sep=""))
@@ -281,7 +304,9 @@ for (i.rep in 1:n.rep) {
 
 # This gives a better sense of the random walk's behavior.
 
-# The next portion of the example uses simulation to numerically compute the expectations, variances, and autocovariance between two (randomly selected) individual measurements.
+# The next portion of the example uses simulation to numerically 
+#compute the expectations, variances, and autocovariance between 
+#two (randomly selected) individual measurements.
 
 n.rep <- 10000
 rand.select <- sample.int(n=n, size=2, replace=FALSE)
@@ -300,10 +325,15 @@ mean.sim <- sum1 / n.rep
 var.sim <- sum2/n.rep - (sum1/n.rep)^2
 acov.sim <- sum12/n.rep - (sum1[1]/n.rep)*(sum1[2]/n.rep)
 
-# The formulas used in this simulation are motivates by the law of large numbers, which establishes that the mean of a sequence of independently simulated values is an accurate apprimation to the expectation of the values being simulated. Simulating a larger sequence improves the accuracy of the approximation.
+# The formulas used in this simulation are motivates by the law of 
+#large numbers, which establishes that the mean of a sequence of 
+#independently simulated values is an accurate apprimation to the 
+#expectation of the values being simulated. Simulating a larger 
+#sequence improves the accuracy of the approximation.
 
-# The means, variances, and autocorrelation given by the formulas are calculated as follows.
-
+# The means, variances, and autocorrelation given by the formulas 
+#are calculated as follows.
+# for probems 1 and 2
 mean.form <- delta*c(s,t)+x0
 var.form <- c(s,t)*sigw^2
 acov.form <- min(s,t)*sigw^2
