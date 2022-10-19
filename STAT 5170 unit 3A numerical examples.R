@@ -359,11 +359,11 @@ durbin.levinson.calc <- function(n, acf.seq) {
 
 # Let us consider the AR(3) time-series model that we worked with earlier. Its paramaters are
 
-p <- 3
-phi1 <- 0.6
-phi2 <- 0.25
+p <- 2
+phi1 <- 1.41
+phi2 <- -0.5
 phi3 <- -0.15
-sigw <- 5
+sigw <- 8
 
 # Borrowing code from before, the ACF of this time-series model is calculated as follows
 
@@ -382,8 +382,8 @@ c.vect[1,1] <- 1
 phi.inv <- solve(phi.mat)
 rho.vect <- phi.inv %*% c.vect
 
-max.lag <-19
-phi <- c(phi1, phi2, phi3)
+max.lag <-2
+phi <- c(phi1, phi2)
 acf.seq <- c(as.numeric(rho.vect), rep(x=0, times=max.lag-p))
 for (lag in p:max.lag) {
 	acf.seq[lag+1] <- sum(phi*acf.seq[seq(from=lag, to=lag-p+1, by=-1)])
@@ -392,9 +392,9 @@ acf.seq
 
 # The PACF values are calculated by the code below
 
-max.lag <- 9
+max.lag <- 3
 result <- durbin.levinson.calc(n=max.lag, acf.seq)
-round(result$pacf, digits=4)
+round(result$pacf, digits=5)
 
 # As we have done before, we can check these values by simulation. This time we calculate the sample PACF of a simulated time series.
 
@@ -444,3 +444,4 @@ pacf(ma.ts.A)
 acf(ma.ts.B)
 pacf(ma.ts.B)
 par(mfrow = c(1, 1))
+

@@ -331,6 +331,8 @@ phi3 <- -0.24
 theta1 <- 0.3
 theta2 <- -0.4
 
+
+
 # Suppose further that the white-noise standard deviation is
 
 sigw <- 1.75
@@ -433,8 +435,8 @@ psi
 
 # In a previous example we worked with the MA(4) time-series model with the following parameters 
 
-sigw <- 1
-theta1 <- 0.1
+sigw <- 7.5
+theta1 <- -0.5
 theta2 <- 0.5
 theta3 <- -0.8
 theta4 <- -0.4
@@ -564,3 +566,7 @@ theta.mat[1:10, (q+1):(q+10)]
 # This, too, is a reflection of the MA model's autocovariance function, gamma(h), which is zero whenever h > q.
 
 # Together, these properties suggest that the Innovations Algorithm may be customized to improve computational costs when forecasting under an MA mode. In other cases, it remains a suitable algorithm for general use. 
+temp <- polyroot(c(1, -9/4, -9/4))
+temp2 <- polyroot(c(1, -3, 1/9, -1/3))
+Mod(temp2)
+# here get rid of the 0.333 since it is redundant.
