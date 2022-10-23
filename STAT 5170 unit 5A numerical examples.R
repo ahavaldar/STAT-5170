@@ -5,7 +5,7 @@
 
 # This set of examples will use several user-defined functions whose definitions are placed in a separate R file. The following code executes the contents of that file, thereby defining the functions.
 
-setwd(ScriptsDirectory)
+#setwd(ScriptsDirectory)
 source("STAT 5170 unit 5 functions.R")
 
 # Functionality from a external package is also needed.

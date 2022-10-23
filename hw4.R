@@ -1,20 +1,20 @@
 #1)
-n <- 19
-x <- 7 #0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0
+n <- 17
+x <- 9 #0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1
 alpha <- 1/2 
 beta <- 1/2
 post.mean <- (alpha+x) / (alpha+beta+n)
-post.mean          # 0.375
+post.mean          # 0.5277778
 
 #2) 
-qprobs <- c(0.28)            # quantiles to input
+qprobs <- c(0.36)            # quantiles to input
 post.quant <- qbeta(p=qprobs, shape1=alpha+x, shape2=beta+n-x)
-post.quant       # 0.3088125
+post.quant       # 0.4860027
 
 #3) 
 res2 <- rbeta(100000, alpha+x, beta+n-x)
 ans <- median(sqrt(res2 * (1-res2)))
-ans           # 0.4823846
+ans           # 0.4931203
 
 #4) 
 run.mcmc.binom <- function(model.parms, comp.parms) {
@@ -64,13 +64,13 @@ model.parms$x <- x
 model.parms$n <- n
 model.parms$alpha <- alpha
 model.parms$beta <- beta
-model.parms$theta <- 0.37
+model.parms$theta <- 0.53
 comp.parms <- list()
 comp.parms$n.samp <- 100000
-comp.parms$theta.rad <- 0.75        # radius
+comp.parms$theta.rad <- 0.85        # radius
 result <- run.mcmc.binom(model.parms, comp.parms)
 hist(result$samp, xlim=c(0, 1), xlab="theta")
-result$rate             # 0.3387
+result$rate             # 0.3076
 
 #5) 
 test.stat <- function(x.seq) {
@@ -79,7 +79,7 @@ test.stat <- function(x.seq) {
   return(stat)
 }
 
-x.obs <- c(0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0)
+x.obs <- c(0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1)
 obs.tstat <- test.stat(x.obs)
 samp.theta <- rbeta(n=100000, shape1=alpha+x, shape2=beta+n-x)
 x.rep <- numeric()
@@ -90,7 +90,7 @@ for(i.samp in 1:100000){
 }
 
 pval <- sum(obs.tstat>samp.tstat) / comp.parms$n.samp
-pval
+pval #0.08303
 
 #6
 library(expm)
@@ -100,8 +100,8 @@ test.stat2 <- function(res) {
   return(stat)
 }
 
-x.vect <-c(-7.2, -1.9, -5.7, 0.2,-1.3, 8.7, 15.4, 22.1,24.0)
-Z.mat <- as.matrix(cbind(rep(x=1, times=9), 1:9))
+x.vect <-c(27.5, 31.9, 33.7, 30.8, 31.8, 41.0, 46.7, 50.1)
+Z.mat <- as.matrix(cbind(rep(x=1, times=8), 1:8))
 reg.summary <- function(x.vect, Z.mat) {
   n <- dim(Z.mat)[1]
   k <- dim(Z.mat)[2]
@@ -118,7 +118,7 @@ reg.summary <- function(x.vect, Z.mat) {
 }
 result <- reg.summary(x.vect, Z.mat)
 b.hat <- result$b.hat
-b.hat          # 4.125
+b.hat          # 3.036905
 
 # or 
 n.samp <- 100000
@@ -137,7 +137,7 @@ for (i.samp in 1:n.samp) {
   sigw <- sqrt(sigw2)
   beta <- b.hat + sqrt.ZpZ.inv %*% as.matrix(rnorm(n=k, mean=0, sd=sigw))
   mu.vect <- Z.mat %*% beta
-  res <- as.numeric(x.vect - mu.vect) #?
+  res <- as.numeric(x.vect - mu.vect) 
   pred.vect <- mu.vect + as.matrix(rnorm(n=n, mean=0, sd=sigw))
   obs.tstat <- test.stat2(res) #?
   samp.tstat[i.samp] <- test.stat2(rnorm(n=n, mean=0, sd=sigw)) #?
@@ -146,25 +146,68 @@ for (i.samp in 1:n.samp) {
   mu.samp[, i.samp] <- as.vector(Z.mat %*% beta)
 }
 
-mean(beta.samp[2,])            # 4.124639
+mean(beta.samp[2,])            # 3.037521
 
 #7) 
-mean(exp(0.5*logsigw2.samp))        # 4.63201
+mean(exp(0.5*logsigw2.samp))        # 4.353689
 
 #8
-qprobs <- c(0.36)
-new <- beta1 + beta2 *9
+beta1 <- mean(beta.samp[1,])
+beta2 <- mean(beta.samp[2,])
+
+qprobs <- c(0.32)
+time = 6
+new <- beta1 + (beta2*time)
 mut <- quantile(new, probs=qprobs)
-mut          # 21.70804 
+mut          #  41.24537  
 
 #9
+x.regen.samp=matrix(nrow=n, ncol=n.samp)
+qprobs.9 = c(0.72)
+for (i.samp in 1:n.samp) {
+  sigw2 = nu*s2 / rchisq(n=1, df=nu)
+  sigw = sqrt(sigw2)
+  beta = b.hat + sqrt.ZpZ.inv %*% as.matrix(rnorm(n=k, mean=0, sd=sigw))
+  mu.vect = Z.mat %*% beta
+  x.regen = mu.vect + as.matrix(rnorm(n=n, mean=0, sd=sigw))
+  x.regen.samp[, i.samp] = as.vector(x.regen)
+}
+
+
+beta1.9 = quantile(beta[1,1], probs=qprobs.9)
+beta2.9 = quantile(beta[2,], probs=qprobs.9)
+sigw.9 = quantile(exp(0.5*logsigw2.samp), probs=qprobs.9)
+mut.9 = quantile(x.regen.samp[5, ], probs=qprobs.9)
+mut.9
+
+mut9.vect = c()
+
+mut9.vect[20] = mut.9
+
+mut9.vect
+
+mean(mut9.vect)
+
 
 #10 
-pval <- sum(obs.tstat > samp.tstat) / comp.parms$n.samp
-pval      
+samp.tstat = numeric()
+obs.tstat = numeric()
+
+for (i.samp in 1:n.samp) {
+  sigw2 <- nu*s2 / rchisq(n=1, df=nu)
+  sigw <- sqrt(sigw2)
+  beta <- b.hat + sqrt.ZpZ.inv %*% as.matrix(rnorm(n=k, mean=0, sd=sigw))
+  mu.vect <- Z.mat %*% beta
+  res <- as.numeric(x.vect - mu.vect)
+  pred.vect <- mu.vect + as.matrix(rnorm(n=n, mean=0, sd=sigw))
+  obs.tstat <- test.stat2(res)
+  samp.tstat[i.samp] <- test.stat2(rnorm(n=n, mean=0, sd=sigw))
+}
+pval <- sum(obs.tstat > samp.tstat) / comp.parms$n.samp  
+pval        # should be 0.26362
 
 #11
-x.11 <-  c(3.4, -0.6, -8.9, -5.7, -2.1, 5.5, 10.5, 4.6)
+x.11 <-  c(-2.7, -5.7, -14.7, -9.7, -6.8, 0.7, 6.0, -0.7)
 run.mcmc.m0.ar1 <- function(model.parms, comp.parms) {
   # ----- ----- subfunctions ----- -----
   log.dgen.dens <- function(x, sigw2, x0, phi) {
@@ -284,7 +327,7 @@ Gamma.inv <- solve(Gamma.mat)
 
 #11
 phi.est <- Gamma.inv %*% gamma.vect
-phi.est              # 0.5663477
+phi.est              # 0.5426625
 
 sigw2.est <- as.numeric(gamma0 - t(phi.est) %*% gamma.vect)
 sigw2.est
@@ -303,20 +346,20 @@ comp.parms$n.samp <- 100000
 comp.parms$sigw2.rad <- 1.5*sigw2.est
 comp.parms$phi.rad <- phi.sderr
 result <- run.mcmc.m0.ar1(model.parms, comp.parms)
-qprobs <- c(0.28,0.5, 0.64)
+qprobs <- c(0.26,0.5, 0.72)
 quant.sigw2 <- quantile(result$samp$sigw2, probs=qprobs)
 quant.phi1 <- quantile(quantile(result$samp$phi[1,], probs=qprobs))
 quant.predx <- quantile(result$samp$predx[model.parms$m,], probs=qprobs)
       
 # 12
 quant.phi1 <- quantile(result$samp$phi[1,], probs=qprobs)
-quant.phi1          # 0.6535969 
+quant.phi1          # 0.4782721  
 
 #13 
 quant.sigw2 <- quantile(result$samp$sigw2, probs=qprobs)
-quant.sigw2         # 29.15047 
+quant.sigw2         # 33.27097  
 
 #14
 quant.predx <- quantile(result$samp$predx[model.parms$m,], probs=qprobs)
-quant.predx     # -3.2227792  
+quant.predx     # 4.2566962   
 
